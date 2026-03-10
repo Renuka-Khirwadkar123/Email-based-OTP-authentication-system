@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+    <div class="login-container">
+        <div class="success-card simple-welcome">
+           
+            <h1 class="welcome-text">Welcome! 🎉</h1>
+            
+            <div class="balloon-container" id="balloons"></div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle removed (no toggle needed on success page)
+        
+      
+
+        // Balloon animation
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            balloon.style.left = Math.random() * 90 + '%';
+            balloon.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            balloon.innerHTML = '🎈';
+            document.getElementById('balloons').appendChild(balloon);
+
+            setTimeout(() => {
+                balloon.remove();
+            }, 5000);
+        }
+
+        // Launch balloons continuously
+        setInterval(createBalloon, 300);
+        
+        // Initial burst
+        for(let i = 0; i < 10; i++) {
+            setTimeout(createBalloon, i * 100);
+        }
+    </script>
+</body>
+</html>
