@@ -1,15 +1,16 @@
 // Core modules and dependencies
+require('dotenv').config();
 const fs = require('fs');
 const express = require("express");
 const readline = require("readline");
 
 // Load email credentials from credentials.json (expects { emailUser, emailPass })
-const credentials = JSON.parse(fs.readFileSync("credentials.json"));
+// const credentials = JSON.parse(fs.readFileSync("credentials.json"));
 const nodemailer = require("nodemailer");
 
 // Express app and configuration
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // In-memory storage for the currently generated OTP.
 // Note: This is ephemeral and will reset if the server restarts.
@@ -24,15 +25,15 @@ function generateOTP() {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: credentials.emailUser,
-    pass: credentials.emailPass
-  }
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+    }
 });
 
 // Helper: send OTP email to the recipient
 async function sendEmail(toEmail, otp) {
   const mailOptions = {
-    from: credentials.emailUser,
+    from: process.env.EMAIL_USER,
     to: toEmail,
     subject: 'Your OTP Code',
     text: `Your OTP is: ${otp}. It is valid for 5 minutes.`
