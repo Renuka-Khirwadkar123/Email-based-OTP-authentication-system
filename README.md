@@ -1,22 +1,175 @@
-# Email OTP Authentication System
+# Email-based OTP Authentication System
 
-A simple and secure email-based OTP (One-Time Password) authentication system built with Node.js and Express.
+A secure, production-ready email-based One-Time Password (OTP) authentication system built with Node.js/Express and deployed on Vercel.
 
-## Features
+## 📁 Project Structure
 
-- **Email-based Login**: Users enter their email address to receive an OTP
-- **OTP Generation**: Automatically generates 6-digit random OTP codes
-- **Email Delivery**: Sends OTP via email using Gmail API
-- **OTP Verification**: Validates the OTP entered by users
-- **Responsive UI**: Clean login and verification pages
+```
+.
+├── backend/                          # Backend API (Node.js + Express)
+│   ├── server.js                    # Express server with OTP logic
+│   ├── automation.js                # Testing automation script
+│   ├── package.json                 # Backend dependencies
+│   ├── .env.example                 # Environment variables template
+│   └── README.md                    # Backend documentation
+├── frontend/                         # Frontend UI (HTML + CSS + JS)
+│   ├── public/
+│   │   ├── login.html               # Email entry page
+│   │   ├── verify.html              # OTP verification page
+│   │   ├── success.html             # Success celebration page
+│   │   └── style.css                # Styles with dark/light theme
+│   └── README.md                    # Frontend documentation
+├── package.json                     # Root package.json
+├── vercel.json                      # Vercel deployment config
+├── .gitignore                       # Git ignore rules
+└── README.md                        # This file
+```
 
-## Tech Stack
+## ✨ Features
 
-- **Backend**: Node.js, Express.js
-- **Email Service**: Gmail API with OAuth2 authentication
-- **Frontend**: HTML, CSS, JavaScript
+- **Email-based Login**: Users enter their email to receive a 6-digit OTP
+- **OTP Generation**: Securely generates random OTP codes
+- **Email Delivery**: Sends OTP via Gmail's SMTP service
+- **OTP Verification**: Validates OTP with instant feedback
+- **Theme Toggle**: Dark/Light mode with persisted preference
+- **Responsive Design**: Works on mobile, tablet, and desktop
+- **Glassmorphism UI**: Modern design with backdrop blur effects
 
-## How It Works
+## 🚀 Quick Start
+
+### Local Development
+
+1. **Clone and install**
+```bash
+git clone <your-repo>
+cd Email-based-OTP-authentication-system
+npm install
+cd backend && npm install && cd ..
+```
+
+2. **Configure environment**
+```bash
+cd backend
+cp .env.example .env
+# Edit .env with your Gmail credentials
+```
+
+3. **Start the server**
+```bash
+npm start
+```
+
+Server runs on `http://localhost:3000`
+
+### Deploy to Vercel
+
+1. **Push to GitHub**
+```bash
+git add .
+git commit -m "Separate frontend and backend structure"
+git push origin main
+```
+
+2. **Deploy on Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Select your repository
+   - Vercel auto-detects the setup
+   - Add environment variables:
+     - `EMAIL_USER`: Your Gmail address
+     - `EMAIL_PASS`: Your Gmail App Password
+   - Click Deploy
+
+## 🔐 Gmail Setup (Required)
+
+1. **Enable 2-Factor Authentication** on your Google Account
+2. **Generate App Password**:
+   - Visit [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+   - Select "Mail" and "Windows Computer" (or your OS)
+   - Copy the generated 16-character password
+3. **Set Environment Variables**:
+   - `EMAIL_USER` = your Gmail address (e.g., yourname@gmail.com)
+   - `EMAIL_PASS` = the 16-character App Password (without spaces)
+
+## 📝 API Routes
+
+| Method | Route | Purpose |
+|--------|-------|---------|
+| GET | `/` | Serves login page |
+| POST | `/send-otp` | Generates and emails OTP |
+| POST | `/verify-Otp` | Verifies the entered OTP |
+| GET | `/test-email` | Tests email configuration |
+
+## 🏗️ Architecture
+
+**Frontend** → **Backend**
+- Frontend serves static HTML/CSS/JS (no build needed)
+- Backend handles OTP logic, email delivery, and verification
+- Vercel runs both simultaneously
+- Static files served with proper routing
+- API endpoints handle form submissions
+
+## 📦 Dependencies
+
+**Backend Package:**
+- `express@^5.2.1` - Web framework
+- `nodemailer@^8.0.2` - Email service
+- `dotenv@^17.3.1` - Environment variables
+- `googleapis@^171.4.0` - Google Sheets API (optional)
+- `playwright@^1.58.2` - Browser automation (testing)
+
+## ⚠️ Important Notes
+
+- **OTP Storage**: Currently stored in memory (resets on server restart)
+  - For production: Use database (MongoDB, PostgreSQL, etc.)
+- **Session Management**: No session tracking currently
+  - For production: Add session persistence
+- **.env Security**: Never commit `.env` to Git
+  - Use `.env.example` as template for others
+- **Deployment**: `vercel.json` configured for automatic builds
+
+## 🧪 Testing
+
+Run the automated test:
+```bash
+cd backend
+node automation.js
+```
+
+Opens browser and completes the full OTP flow automatically.
+
+## ✅ Checklist for Production
+
+- [ ] Add database for persistent OTP storage
+- [ ] Implement rate limiting on `/send-otp`
+- [ ] Add email templates instead of plain text
+- [ ] Set OTP expiration time (currently: no limit)
+- [ ] Add CSRF protection
+- [ ] Use HTTPS (automatic on Vercel)
+- [ ] Monitor email delivery failures
+- [ ] Set up error logging (e.g., Sentry)
+- [ ] Add security headers
+- [ ] Test with real Gmail accounts
+
+## 🔧 Troubleshooting
+
+**"Failed to send OTP"**
+- Check `EMAIL_USER` and `EMAIL_PASS` in environment variables
+- Verify Gmail App Password is correct (16 chars, no spaces)
+- Test with `/test-email` endpoint
+
+**UI Not Loading**
+- Verify `vercel.json` routes are correct
+- Check browser console for errors (F12)
+- Review Vercel deployment logs
+
+**OTP Not Received**
+- Check spam folder
+- Verify email address is typed correctly
+- Test transporter configuration
+
+## 📄 License
+
+ISC
 
 1. User enters their email address on the login page
 2. System generates a 6-digit OTP
