@@ -39,9 +39,9 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.urlencoded({ extended: true }));
 
-// Health-check / root route
+// Health-check / root route - redirect to login page
 app.get('/', (req, res) => {
-  res.send('Server is running!');
+  res.redirect('/login.html');
 });
 
 // Route: receive email address, generate OTP, email it, then redirect user to verify page
