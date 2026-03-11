@@ -1,28 +1,18 @@
-import dotenv from 'dotenv';
-import express from 'express';
-import nodemailer from 'nodemailer';
-import path from 'path';
-import { fileURLToPath } from 'url';
+require('dotenv').config();
+const express = require('express');
+const nodemailer = require('nodemailer');
+const path = require('path');
+const { fileURLToPath } = require('url');
 
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Express app and configuration
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// In-memory storage for the currently generated OTP.
-// Note: This is ephemeral and will reset if the server restarts.
 let currentOTP = '';
 
-// Utility: generate a 6-digit numeric OTP as a string
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Configure Nodemailer transporter using Gmail and loaded credentials
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -30,6 +20,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
 
 // Helper: send OTP email to the recipient
 async function sendEmail(toEmail, otp) {
@@ -102,4 +93,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Export the app for Vercel serverless functions
-export default app;
+module.exports = app;  // ✅ CommonJS export
