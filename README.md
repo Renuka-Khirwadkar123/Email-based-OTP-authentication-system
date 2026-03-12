@@ -1,252 +1,75 @@
 # Email-based OTP Authentication System
 
-A secure, production-ready email-based One-Time Password (OTP) authentication system built with Node.js/Express and deployed on Vercel.
+This project implements a simple email-based One-Time Password (OTP) authentication demo with end-to-end automation. The repo includes static frontend pages, serverless API endpoints (for sending and verifying OTPs), and Playwright automation that validates the full flow by reading OTP emails from Gmail.
 
-## 📁 Project Structure
+Overview
+- Frontend: static HTML/CSS/JS under `public/`.
+- API: serverless endpoints in `api/` for `send-otp` and `verify-otp`.
+- Automation: Playwright tests and Gmail helpers in `automation_scripts/`.
 
-```
-.
-├── backend/                          # Backend API (Node.js + Express)
-│   ├── server.js                    # Express server with OTP logic
-│   ├── automation.js                # Testing automation script
-│   ├── package.json                 # Backend dependencies
-│   ├── .env.example                 # Environment variables template
-│   └── README.md                    # Backend documentation
-├── frontend/                         # Frontend UI (HTML + CSS + JS)
-│   ├── public/
-│   │   ├── login.html               # Email entry page
-│   │   ├── verify.html              # OTP verification page
-│   │   ├── success.html             # Success celebration page
-│   │   └── style.css                # Styles with dark/light theme
-│   └── README.md                    # Frontend documentation
-├── package.json                     # Root package.json
-├── vercel.json                      # Vercel deployment config
-├── .gitignore                       # Git ignore rules
-└── README.md                        # This file
-```
+Tech stack
+- Node.js for API and helper scripts
+- Playwright (`@playwright/test`) for browser automation
+- Google APIs (`googleapis`) for reading Gmail (automation only)
 
-## ✨ Features
+What is implemented
+- A minimal OTP flow: user submits email → backend generates a 6-digit OTP → backend sends OTP by email → user enters OTP → backend verifies.
+- Playwright-based automation that:
+	1. Opens the login page and requests an OTP
+	2. Polls the test Gmail inbox for the OTP email
+	3. Extracts the OTP and completes verification
+	4. Asserts that the success page is shown
 
-- **Email-based Login**: Users enter their email to receive a 6-digit OTP
-- **OTP Generation**: Securely generates random OTP codes
-- **Email Delivery**: Sends OTP via Gmail's SMTP service
-- **OTP Verification**: Validates OTP with instant feedback
-- **Theme Toggle**: Dark/Light mode with persisted preference
-- **Responsive Design**: Works on mobile, tablet, and desktop
-- **Glassmorphism UI**: Modern design with backdrop blur effects
+Folder layout (what to find where)
+- `api/` — serverless endpoints (send/verify OTP)
+- `public/` — static frontend: `login.html`, `verify.html`, `success.html`, `style.css`
+- `automation_scripts/` — Playwright tests and Gmail helper utilities (`gmailUtility.js`, `otp_automation.js`)
+- `getToken.js` — interactive script to create `token.json` (OAuth token for Gmail reads)
+- `playwright.config.js` — Playwright configuration
+- `.gitignore` — ignores `node_modules`, `credentials.json`, `token.json`, `.env`, Playwright artifacts, etc.
 
-## 🚀 Quick Start
-
-### Local Development
-
-1. **Clone and install**
+Quick start (developer)
+1. Install:
 ```bash
-git clone <your-repo>
-cd Email-based-OTP-authentication-system
 npm install
-cd backend && npm install && cd ..
 ```
 
-2. **Configure environment**
+2. If you will run the Playwright automation, prepare Gmail access:
+- Enable Gmail API in your Google Cloud project.
+- Create OAuth credentials and download `credentials.json` to the project root (do not commit).
+- Run the token helper and follow the URL to authorize the test Gmail account:
 ```bash
-cd backend
-cp .env.example .env
-# Edit .env with your Gmail credentials
+node getToken.js
 ```
+This will create `token.json` that the automation uses to read OTP emails.
 
-3. **Start the server**
+3. Run Playwright automation:
 ```bash
-npm start
+npx playwright test --config=playwright.config.js
 ```
 
-Server runs on `http://localhost:3000`
+Notes and tips
+- `token.json` must be generated with the same OAuth client (`credentials.json`) and authorized using the same Gmail account the test expects.
+- If you get Gmail API errors about project/API access or `invalid_grant`, verify:
+	- Gmail API is enabled for the correct Cloud project
+	- The OAuth client and refresh token belong to the same project and user
+	- The test Gmail account is added to OAuth consent Test Users if required
+- For simple email sending (not automation), you can use SMTP and an App Password instead of the Gmail API.
+- Keep secrets out of the repository: `credentials.json`, `token.json`, and any `.env` should remain local and are listed in `.gitignore`.
 
-### Deploy to Vercel
-
-1. **Push to GitHub**
+Commands summary
 ```bash
-git add .
-git commit -m "Separate frontend and backend structure"
-git push origin main
+npm install
+node getToken.js   # interactive: open URL, authorize, paste code
+npx playwright test --config=playwright.config.js
 ```
 
-2. **Deploy on Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Select your repository
-   - Vercel auto-detects the setup
-   - Add environment variables:
-     - `EMAIL_USER`: Your Gmail address
-     - `EMAIL_PASS`: Your Gmail App Password
-   - Click Deploy
+Troubleshooting
+- OTP not received: check spam folder and API logs; ensure the test Gmail account matches `token.json`.
+- Gmail API errors: enable API for the correct project and regenerate `token.json` using `node getToken.js`.
 
-## 🔐 Gmail Setup (Required)
+License
+MIT
+--
 
-1. **Enable 2-Factor Authentication** on your Google Account
-2. **Generate App Password**:
-   - Visit [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-   - Select "Mail" and "Windows Computer" (or your OS)
-   - Copy the generated 16-character password
-3. **Set Environment Variables**:
-   - `EMAIL_USER` = your Gmail address (e.g., yourname@gmail.com)
-   - `EMAIL_PASS` = the 16-character App Password (without spaces)
-
-## 📝 API Routes
-
-| Method | Route | Purpose |
-|--------|-------|---------|
-| GET | `/` | Serves login page |
-| POST | `/send-otp` | Generates and emails OTP |
-| POST | `/verify-Otp` | Verifies the entered OTP |
-| GET | `/test-email` | Tests email configuration |
-
-## 🏗️ Architecture
-
-**Frontend** → **Backend**
-- Frontend serves static HTML/CSS/JS (no build needed)
-- Backend handles OTP logic, email delivery, and verification
-- Vercel runs both simultaneously
-- Static files served with proper routing
-- API endpoints handle form submissions
-
-## 📦 Dependencies
-
-**Backend Package:**
-- `express@^5.2.1` - Web framework
-- `nodemailer@^8.0.2` - Email service
-- `dotenv@^17.3.1` - Environment variables
-- `googleapis@^171.4.0` - Google Sheets API (optional)
-- `playwright@^1.58.2` - Browser automation (testing)
-
-## ⚠️ Important Notes
-
-- **OTP Storage**: Currently stored in memory (resets on server restart)
-  - For production: Use database (MongoDB, PostgreSQL, etc.)
-- **Session Management**: No session tracking currently
-  - For production: Add session persistence
-- **.env Security**: Never commit `.env` to Git
-  - Use `.env.example` as template for others
-- **Deployment**: `vercel.json` configured for automatic builds
-
-## 🧪 Testing
-
-Run the automated test:
-```bash
-cd backend
-node automation.js
-```
-
-Opens browser and completes the full OTP flow automatically.
-
-## ✅ Checklist for Production
-
-- [ ] Add database for persistent OTP storage
-- [ ] Implement rate limiting on `/send-otp`
-- [ ] Add email templates instead of plain text
-- [ ] Set OTP expiration time (currently: no limit)
-- [ ] Add CSRF protection
-- [ ] Use HTTPS (automatic on Vercel)
-- [ ] Monitor email delivery failures
-- [ ] Set up error logging (e.g., Sentry)
-- [ ] Add security headers
-- [ ] Test with real Gmail accounts
-
-## 🔧 Troubleshooting
-
-**"Failed to send OTP"**
-- Check `EMAIL_USER` and `EMAIL_PASS` in environment variables
-- Verify Gmail App Password is correct (16 chars, no spaces)
-- Test with `/test-email` endpoint
-
-**UI Not Loading**
-- Verify `vercel.json` routes are correct
-- Check browser console for errors (F12)
-- Review Vercel deployment logs
-
-**OTP Not Received**
-- Check spam folder
-- Verify email address is typed correctly
-- Test transporter configuration
-
-## 📄 License
-
-ISC
-
-1. User enters their email address on the login page
-2. System generates a 6-digit OTP
-3. OTP is sent to the user's email via Gmail API
-4. User enters the received OTP on the verification page
-5. System validates the OTP and grants access
-
-## Setup Instructions
-
-### Prerequisites
-
-- Node.js installed
-- Gmail account
-- Google Cloud Project with Gmail API enabled
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd emailAutomation
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Set up Google OAuth2 credentials:
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project or select existing one
-   - Enable Gmail API
-   - Create OAuth 2.0 credentials
-   - Download credentials and save as `credentials.json` in the project root
-
-4. Generate access token:
-   ```bash
-   node getToken.js
-   ```
-   - Follow the URL provided
-   - Authorize the application
-   - Paste the code back in terminal
-   - `token.json` will be generated
-
-5. Start the server:
-   ```bash
-   node server.js
-   ```
-
-6. Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
-
-## Project Structure
-
-```
-emailAutomation/
-├── server.js           # Main server file
-├── getToken.js         # OAuth token generation script
-├── credentials.json    # Google OAuth2 credentials (not in repo)
-├── token.json          # Generated access token (not in repo)
-├── package.json        # Dependencies
-└── public/
-    ├── login.html      # Login page
-    └── verify.html     # OTP verification page
-```
-
-## Security Notes
-
-⚠️ **Important**: Never commit sensitive files to your repository:
-- `credentials.json`
-- `token.json`
-- `.env`
-
-Add these to your `.gitignore` file.
-
-## License
-
-MIT License
+If you want, I can: update `automation_scripts/otp_automation.js` to print the authorization URL automatically, or run `node getToken.js` and help paste the code here (you must paste the code from your browser). Which do you prefer? 
