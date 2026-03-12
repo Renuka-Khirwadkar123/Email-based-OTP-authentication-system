@@ -67,9 +67,3 @@ npx playwright test --config=playwright.config.js
 Troubleshooting
 - OTP not received: check spam folder and API logs; ensure the test Gmail account matches `token.json`.
 - Gmail API errors: enable API for the correct project and regenerate `token.json` using `node getToken.js`.
-
-License
-MIT
---
-
-If you want, I can: update `automation_scripts/otp_automation.js` to print the authorization URL automatically, or run `node getToken.js` and help paste the code here (you must paste the code from your browser). Which do you prefer? 
