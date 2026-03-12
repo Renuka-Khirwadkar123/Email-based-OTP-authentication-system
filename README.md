@@ -1,5 +1,8 @@
 # Email-based OTP Authentication System
 
+This application is hosted on vercel-https://github.com/Renuka-Khirwadkar123/Email-based-OTP-authentication-system
+
+
 This project implements a simple email-based One-Time Password (OTP) authentication demo with end-to-end automation. The repo includes static frontend pages, serverless API endpoints (for sending and verifying OTPs), and Playwright automation that validates the full flow by reading OTP emails from Gmail.
 
 Overview
